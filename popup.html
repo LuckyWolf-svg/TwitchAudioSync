@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 280px;
+      padding: 12px;
+      font-family: Arial, sans-serif;
+      background: #18181b;
+      color: #efeff1;
+      margin: 0;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .header h3 {
+      margin: 0;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-btn:hover {
+      color: #fff;
+    }
+    .status {
+      font-size: 12px;
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .btn {
+      background: #9147ff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      width: 100%;
+      margin: 4px 0;
+      text-align: center;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .offset-section {
+      margin: 10px 0;
+    }
+    .offset-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .offset-row label {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .offset-row input {
+      width: 110px;
+      padding: 4px;
+      border-radius: 0;
+      border: 1px solid #444;
+      background: #0e0e10;
+      color: #efeff1;
+      font-size: 13px;
+    }
+    .offset-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .small-btn {
+      background: #3a3a3d;
+      color: #efeff1;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .small-btn:hover {
+      background: #555;
+    }
+    .stop-btn {
+      background: #e74c3c;
+      color: white;
+    }
+    .stop-btn:hover {
+      background: #c0392b;
+    }
+    .note {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+    .volume-popup {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .volume-popup label {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .volume-popup input[type="range"] {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: #555;
+      outline: none;
+      border-radius: 2px;
+    }
+    .volume-popup input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: #9147ff;
+      border-radius: 0;
+      cursor: pointer;
+    }
+    .volume-popup input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      background: #9147ff;
+      border-radius: 0;
+      cursor: pointer;
+      border: none;
+    }
+    .volume-popup span {
+      min-width: 32px;
+      text-align: right;
+      font-size: 13px;
+    }
+    .settings-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 8px 0 4px;
+      font-size: 12px;
+    }
+    .settings-row label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .settings-row input[type="checkbox"] {
+      accent-color: #9147ff;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h3>Audio Sync</h3>
+    <button class="close-btn" id="close-btn" title="Закрыть окно">✕</button>
+  </div>
+
+  <div class="status" id="audio-status">Аудио не загружено</div>
+  <button class="btn" id="load-btn" title="Загрузить аудиофайл (MP3, WAV, OGG, FLAC, AAC)">📂 Загрузить аудиофайл</button>
+
+  <div class="volume-popup">
+    <label>Громкость:</label>
+    <input type="range" id="volume-slider-popup" min="0" max="100" value="100" step="1" title="Громкость аудио">
+    <span id="volume-value-popup">100%</span>
+  </div>
+
+  <div class="settings-row">
+    <label title="Автоматически корректировать расхождение времени аудио и видео"><input type="checkbox" id="auto-correction-popup" checked> Автокоррекция</label>
+    <label title="Автоматически ставить VOD на паузу при переключении вкладки"><input type="checkbox" id="pause-on-tab-switch-popup"> Пауза</label>
+  </div>
+
+  <div class="offset-section">
+    <div class="offset-row">
+      <label>Отклонение:</label>
+      <input type="text" id="offset-input" value="00:00:00.0" title="Введите отклонение в формате ЧЧ:ММ:СС.д">
+      <button class="small-btn" id="reset-offset-popup" title="Сбросить отклонение в ноль">↺</button>
+    </div>
+    <div class="offset-buttons">
+      <button class="small-btn" id="offset-minus" title="Уменьшить отклонение на 0.1 секунды">-0.1s</button>
+      <button class="small-btn" id="offset-plus" title="Увеличить отклонение на 0.1 секунды">+0.1s</button>
+    </div>
+  </div>
+
+  <button class="btn" id="sync-btn" disabled title="Включить/выключить синхронизацию">▶ Включить синхронизацию</button>
+  <button class="btn stop-btn" id="eject-btn" title="Вытащить кассету (выгрузить аудио)">⏹ Вытащить кассету</button>
+  <div class="note">Кликните иконку расширения, чтобы открыть это окно повторно.</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

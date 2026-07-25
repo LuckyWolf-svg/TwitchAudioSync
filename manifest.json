@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch VOD Audio Sync",
+  "version": "1.3",
+  "description": "Синхронизация внешнего аудио с VOD на Twitch",
+  "permissions": [],
+  "host_permissions": ["*://www.twitch.tv/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Twitch Audio Sync"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.twitch.tv/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
