@@ -67,6 +67,16 @@
   let previousVolume = 100;
   let isMuted = false;
   let syncInterval = null;
+  let wasPlayingBeforeHide = false;
+
+  function updatePlaybackRate() {
+    if (!audio || !syncActive) return;
+    const rate = video.playbackRate;
+    if (audio.playbackRate !== rate) {
+      audio.playbackRate = rate;
+    }
+  }
+  video.addEventListener('ratechange', updatePlaybackRate);
 
   const panel = document.createElement('div');
   panel.id = 'audio-sync-panel';
@@ -319,6 +329,7 @@
     audio = new Audio(url);
     audio.preload = 'auto';
     audio.loop = false;
+    audio.playbackRate = video.playbackRate;
     connectAudio(audio);
     setupEvents();
 
@@ -410,6 +421,8 @@
   function syncPos() {
     if (!audio || !syncActive) return;
 
+    updatePlaybackRate();
+
     if (audioContext && audioContext.state === 'suspended') {
       audioContext.resume().catch(() => {});
     }
@@ -454,6 +467,7 @@
       setOffInput(offset);
     }
     applyOff();
+    updatePlaybackRate();
     startInt();
     video.addEventListener('timeupdate', updateBtn);
     syncPos();
@@ -524,6 +538,7 @@
       const url = URL.createObjectURL(blob);
       audio = new Audio(url);
       audio.preload = 'auto';
+      audio.playbackRate = video.playbackRate;
       connectAudio(audio);
       setupEvents();
       audioName = msg.fileName;
@@ -590,6 +605,8 @@
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
+      wasPlayingBeforeHide = !video.paused;
+
       if (audio && syncActive && pauseOnTabSwitch && !video.paused) {
         video.pause();
       }
@@ -600,6 +617,11 @@
       if (audioContext && audioContext.state === 'suspended') {
         audioContext.resume().catch(() => {});
       }
+
+      if (!pauseOnTabSwitch && wasPlayingBeforeHide && video.paused) {
+        video.play().catch(() => {});
+      }
+
       if (audio && syncActive && !video.paused && audio.paused && audio.readyState >= 2) {
         audio.play().catch(() => {});
       }
