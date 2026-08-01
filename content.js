@@ -69,6 +69,11 @@
   let syncInterval = null;
   let wasPlayingBeforeHide = false;
 
+  const savedAuto = localStorage.getItem('twitchAudioSyncAutoCorrection');
+  if (savedAuto !== null) autoCorrectionEnabled = savedAuto === 'true';
+  const savedPause = localStorage.getItem('twitchAudioSyncPauseOnTabSwitch');
+  if (savedPause !== null) pauseOnTabSwitch = savedPause === 'true';
+
   function updatePlaybackRate() {
     if (!audio || !syncActive) return;
     const rate = video.playbackRate;
@@ -144,8 +149,8 @@
       </div>
 
       <div class="settings-row">
-        <label title="Автоматически корректировать расхождение времени аудио и видео"><input type="checkbox" id="auto-correction-checkbox" checked> Автокоррекция</label>
-        <label title="Автоматически ставить VOD на паузу при переключении вкладки"><input type="checkbox" id="pause-on-tab-switch-checkbox"> Пауза</label>
+        <label title="Автоматически корректировать расхождение времени аудио и видео"><input type="checkbox" id="auto-correction-checkbox" ${autoCorrectionEnabled ? 'checked' : ''}> Автокоррекция</label>
+        <label title="Автоматически ставить VOD на паузу при переключении вкладки"><input type="checkbox" id="pause-on-tab-switch-checkbox" ${pauseOnTabSwitch ? 'checked' : ''}> Пауза</label>
       </div>
     </div>
   `;
@@ -519,10 +524,12 @@
 
   autoCorrectionCheckbox.addEventListener('change', () => {
     autoCorrectionEnabled = autoCorrectionCheckbox.checked;
+    localStorage.setItem('twitchAudioSyncAutoCorrection', String(autoCorrectionEnabled));
   });
 
   pauseOnTabSwitchCheckbox.addEventListener('change', () => {
     pauseOnTabSwitch = pauseOnTabSwitchCheckbox.checked;
+    localStorage.setItem('twitchAudioSyncPauseOnTabSwitch', String(pauseOnTabSwitch));
   });
 
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -592,11 +599,13 @@
     } else if (msg.action === 'setAutoCorrection') {
       autoCorrectionEnabled = msg.enabled;
       autoCorrectionCheckbox.checked = autoCorrectionEnabled;
+      localStorage.setItem('twitchAudioSyncAutoCorrection', String(autoCorrectionEnabled));
       sendResponse({});
       return true;
     } else if (msg.action === 'setPauseOnTabSwitch') {
       pauseOnTabSwitch = msg.enabled;
       pauseOnTabSwitchCheckbox.checked = pauseOnTabSwitch;
+      localStorage.setItem('twitchAudioSyncPauseOnTabSwitch', String(pauseOnTabSwitch));
       sendResponse({});
       return true;
     }
