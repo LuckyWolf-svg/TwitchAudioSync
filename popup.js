@@ -74,12 +74,28 @@ volumeSliderPopup.addEventListener('input', () => {
   updateVolPop(parseInt(volumeSliderPopup.value, 10));
 });
 
+function loadSettingsFromStorage() {
+  const savedAuto = localStorage.getItem('twitchAudioSyncAutoCorrection');
+  if (savedAuto !== null) {
+    autoCorrectionPopup.checked = savedAuto === 'true';
+  }
+  const savedPause = localStorage.getItem('twitchAudioSyncPauseOnTabSwitch');
+  if (savedPause !== null) {
+    pauseOnTabSwitchPopup.checked = savedPause === 'true';
+  }
+}
+loadSettingsFromStorage();
+
 autoCorrectionPopup.addEventListener('change', () => {
-  sendMsg({ action: 'setAutoCorrection', enabled: autoCorrectionPopup.checked });
+  const enabled = autoCorrectionPopup.checked;
+  localStorage.setItem('twitchAudioSyncAutoCorrection', String(enabled));
+  sendMsg({ action: 'setAutoCorrection', enabled });
 });
 
 pauseOnTabSwitchPopup.addEventListener('change', () => {
-  sendMsg({ action: 'setPauseOnTabSwitch', enabled: pauseOnTabSwitchPopup.checked });
+  const enabled = pauseOnTabSwitchPopup.checked;
+  localStorage.setItem('twitchAudioSyncPauseOnTabSwitch', String(enabled));
+  sendMsg({ action: 'setPauseOnTabSwitch', enabled });
 });
 
 loadBtn.addEventListener('click', async () => {
@@ -172,9 +188,11 @@ ejectBtn.addEventListener('click', async () => {
       }
       if (response.autoCorrection !== undefined) {
         autoCorrectionPopup.checked = response.autoCorrection;
+        localStorage.setItem('twitchAudioSyncAutoCorrection', String(response.autoCorrection));
       }
       if (response.pauseOnTabSwitch !== undefined) {
         pauseOnTabSwitchPopup.checked = response.pauseOnTabSwitch;
+        localStorage.setItem('twitchAudioSyncPauseOnTabSwitch', String(response.pauseOnTabSwitch));
       }
     }
   });
